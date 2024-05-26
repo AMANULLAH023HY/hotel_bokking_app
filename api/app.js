@@ -7,8 +7,12 @@ dotenv.config();
 
 const app = express();
 
-app.use(express());
+app.use(express.json());
 app.use(bodyParser());
+
+// user route
+const userRoute = require('./routes/userRoute')
+app.use('/api/user',userRoute)
 
 app.all("*", (req, res) => {
   res.status(400).json({
