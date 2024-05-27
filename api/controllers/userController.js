@@ -1,10 +1,21 @@
 const db = require("../config/db");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
+const { check, validationResult } =require("express-validator");
+
+
 
 // User signup controller
 const signupController = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.status(400).json({
+            message:errors.array()
+        })
+    } 
+
+
     const user = req.body;
     let query = "SELECT email FROM user WHERE email = ?";
     db.query(query, [user.email], async (err, result) => {
@@ -60,9 +71,17 @@ const signupController = async (req, res) => {
   }
 };
 
-// User login controller
+
+
+// // User login controller
 const loginController = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.status(400).json({
+            message:errors.array()
+        })
+    } 
     const { email, password } = req.body;
     let query = "SELECT * FROM user WHERE email = ?";
     db.query(query, [email], async (err, result) => {
@@ -105,4 +124,22 @@ const loginController = async (req, res) => {
   }
 };
 
-module.exports = { signupController, loginController };
+
+// verify token controller
+const verifyTokenController = (req,res)=>{
+  try {
+    res.status(200).json({
+     message:"Token verify successfully!",
+     userId:req.userId
+    })
+    
+  } catch (error) {
+    res.status(500).json({
+      message:"Internal server Error",
+      error:error.message
+    })
+    
+  }
+}
+
+module.exports = { signupController, loginController,verifyTokenController };
